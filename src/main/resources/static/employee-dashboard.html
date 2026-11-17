@@ -1,0 +1,702 @@
+<html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Employee Dashboard</title>
+
+    <link rel="stylesheet"
+          href="style.css">
+
+</head>
+
+<body>
+
+    <!-- Dashboard Heading -->
+    <h1>
+        Welcome, <span id="welcomeName"></span>
+    </h1>
+
+    <!-- Logout Button -->
+    <div style="text-align: right; margin: 15px;">
+        <button onclick="logout()">
+            Logout
+        </button>
+    </div>
+
+
+    <!-- ================= MY PROFILE ================= -->
+
+    <h2>👤 My Profile</h2>
+
+    <div id="myProfile">
+
+        <p>
+            <strong>Employee ID:</strong>
+            <span id="profileEmployeeCode"></span>
+        </p>
+
+        <p>
+            <strong>Full Name:</strong>
+            <span id="profileName"></span>
+        </p>
+
+        <p>
+            <strong>Email:</strong>
+            <span id="profileEmail"></span>
+        </p>
+
+        <p>
+            <strong>Phone:</strong>
+            <span id="profilePhone"></span>
+        </p>
+
+        <p>
+            <strong>Department:</strong>
+            <span id="profileDepartment"></span>
+        </p>
+
+        <p>
+            <strong>Designation:</strong>
+            <span id="profileDesignation"></span>
+        </p>
+
+        <p>
+            <strong>Joining Date:</strong>
+            <span id="profileJoiningDate"></span>
+        </p>
+
+        <p>
+            <strong>Username:</strong>
+            <span id="profileUsername"></span>
+        </p>
+        
+        <!-- =====================================================
+     CHANGE PASSWORD
+     ===================================================== -->
+
+<h2>🔐 Change Password</h2>
+
+<div id="changePasswordSection">
+
+    <label>Current Password:</label>
+
+    <input type="password"
+           id="currentPassword"
+           placeholder="Enter current password"
+           required>
+
+    <br><br>
+
+    <label>New Password:</label>
+
+    <input type="password"
+           id="newPassword"
+           placeholder="Enter new password"
+           required>
+
+    <br><br>
+
+    <label>Confirm New Password:</label>
+
+    <input type="password"
+           id="confirmPassword"
+           placeholder="Confirm new password"
+           required>
+
+    <br><br>
+
+    <button onclick="changeEmployeePassword()">
+        🔐 Change Password
+    </button>
+
+
+
+    </div>
+
+
+    <!-- ================= LEAVE SUMMARY ================= -->
+
+    <h2>📊 My Leave Summary</h2>
+
+    <div class="summary-container">
+
+        <div class="summary-card">
+            <h3>Total Leaves</h3>
+            <span id="totalLeaves">0</span>
+        </div>
+
+        <div class="summary-card">
+            <h3>Pending</h3>
+            <span id="pendingLeaves">0</span>
+        </div>
+
+        <div class="summary-card">
+            <h3>Approved</h3>
+            <span id="approvedLeaves">0</span>
+        </div>
+
+        <div class="summary-card">
+            <h3>Rejected</h3>
+            <span id="rejectedLeaves">0</span>
+        </div>
+
+    </div>
+
+
+    <!-- ================= APPLY LEAVE ================= -->
+
+    <h2>📝 Apply Leave</h2>
+
+    <form id="leaveForm">
+
+        <label>
+            Leave Type:
+        </label>
+
+        <select id="leaveType" required>
+
+            <option value="">
+                Select Leave Type
+            </option>
+
+            <option value="Casual Leave">
+                Casual Leave
+            </option>
+
+            <option value="Sick Leave">
+                Sick Leave
+            </option>
+
+            <option value="Earned Leave">
+                Earned Leave
+            </option>
+
+            <option value="Emergency Leave">
+                Emergency Leave
+            </option>
+
+        </select>
+
+
+        <label>
+            Start Date:
+        </label>
+
+        <input type="date"
+               id="startDate"
+               required>
+
+
+        <label>
+            End Date:
+        </label>
+
+        <input type="date"
+               id="endDate"
+               required>
+
+
+        <label>
+            Reason:
+        </label>
+
+        <input type="text"
+               id="reason"
+               placeholder="Enter reason"
+               required>
+
+
+        <button type="submit">
+            Apply Leave
+        </button>
+
+    </form>
+
+
+    <p id="leaveMessage"></p>
+
+
+    <!-- ================= LEAVE HISTORY ================= -->
+
+    <h2>📋 My Leave History</h2>
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    Leave Type
+                </th>
+
+                <th>
+                    Start Date
+                </th>
+
+                <th>
+                    End Date
+                </th>
+
+                <th>
+                    Reason
+                </th>
+
+                <th>
+                    Status
+                </th>
+
+            </tr>
+
+        </thead>
+
+        <tbody id="leaveTableBody">
+
+        </tbody>
+
+    </table>
+
+
+    <!-- ================= NOTIFICATIONS ================= -->
+
+    <h2>🔔 Notifications</h2>
+
+    <div id="notifications">
+
+    </div>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script>
+
+        // Login केलेल्या employee ची profile load करतो
+        function loadEmployeeProfile() {
+
+            const employeeId =
+                localStorage.getItem("employeeId");
+
+            // Employee ID नसेल तर profile load करू नये
+            if (!employeeId) {
+                return;
+            }
+
+            // Database मधून employee details घेतो
+            fetch("/employees/" + employeeId)
+
+            .then(response =>
+                response.json()
+            )
+
+            .then(employee => {
+
+                if (!employee) {
+                    return;
+                }
+
+                // Employee ID
+                document.getElementById(
+                    "profileEmployeeCode"
+                ).innerText =
+                    employee.employeeCode || "-";
+
+
+                // Full Name
+                document.getElementById(
+                    "profileName"
+                ).innerText =
+                    employee.name || "-";
+
+
+                // Email
+                document.getElementById(
+                    "profileEmail"
+                ).innerText =
+                    employee.email || "-";
+
+
+                // Phone
+                document.getElementById(
+                    "profilePhone"
+                ).innerText =
+                    employee.phone || "-";
+
+
+                // Department
+                document.getElementById(
+                    "profileDepartment"
+                ).innerText =
+                    employee.department || "-";
+
+
+                // Designation
+                document.getElementById(
+                    "profileDesignation"
+                ).innerText =
+                    "Full Stack Developer";
+
+
+                // Joining Date
+                document.getElementById(
+                    "profileJoiningDate"
+                ).innerText =
+                    employee.joiningDate || "-";
+
+
+                // Username
+                document.getElementById(
+                    "profileUsername"
+                ).innerText =
+                    localStorage.getItem("username") || "-";
+
+
+                // Welcome name
+                document.getElementById(
+                    "welcomeName"
+                ).innerText =
+                    employee.name || "-";
+
+            })
+
+            .catch(error => {
+
+                console.error(
+                    "Employee Profile Error:",
+                    error
+                );
+
+            });
+
+        }
+
+
+        // ================= LOAD LEAVES =================
+
+        function loadEmployeeLeaves() {
+
+            const employeeId =
+                localStorage.getItem("employeeId");
+
+            if (!employeeId) {
+                return;
+            }
+
+            fetch(
+                "/leaves/employee/" +
+                employeeId
+            )
+
+            .then(response =>
+                response.json()
+            )
+
+            .then(leaves => {
+
+                const tableBody =
+                    document.getElementById(
+                        "leaveTableBody"
+                    );
+
+                tableBody.innerHTML = "";
+
+
+                let pending = 0;
+                let approved = 0;
+                let rejected = 0;
+
+
+                leaves.forEach(leave => {
+
+                    // Status count
+                    if (leave.status === "Pending") {
+                        pending++;
+                    }
+
+                    if (leave.status === "Approved") {
+                        approved++;
+                    }
+
+                    if (leave.status === "Rejected") {
+                        rejected++;
+                    }
+
+
+                    // Table row
+                    const row =
+                        document.createElement("tr");
+
+
+                    row.innerHTML =
+
+                        "<td>" +
+                        leave.leaveType +
+                        "</td>" +
+
+                        "<td>" +
+                        leave.startDate +
+                        "</td>" +
+
+                        "<td>" +
+                        leave.endDate +
+                        "</td>" +
+
+                        "<td>" +
+                        leave.reason +
+                        "</td>" +
+
+                        "<td>" +
+                        leave.status +
+                        "</td>";
+
+
+                    tableBody.appendChild(row);
+
+                });
+
+
+                // Summary update
+                document.getElementById(
+                    "totalLeaves"
+                ).innerText =
+                    leaves.length;
+
+
+                document.getElementById(
+                    "pendingLeaves"
+                ).innerText =
+                    pending;
+
+
+                document.getElementById(
+                    "approvedLeaves"
+                ).innerText =
+                    approved;
+
+
+                document.getElementById(
+                    "rejectedLeaves"
+                ).innerText =
+                    rejected;
+
+
+                // Notifications
+                loadNotifications(leaves);
+
+            })
+
+            .catch(error => {
+
+                console.error(
+                    "Leave Error:",
+                    error
+                );
+
+            });
+
+        }
+
+
+        // ================= APPLY LEAVE =================
+
+        document.getElementById(
+            "leaveForm"
+        ).addEventListener(
+            "submit",
+            function(event) {
+
+                // Page refresh hou naye
+                event.preventDefault();
+
+
+                const employeeId =
+                    localStorage.getItem(
+                        "employeeId"
+                    );
+
+
+                const leaveData = {
+
+                    employeeId:
+                        Number(employeeId),
+
+                    leaveType:
+                        document.getElementById(
+                            "leaveType"
+                        ).value,
+
+                    startDate:
+                        document.getElementById(
+                            "startDate"
+                        ).value,
+
+                    endDate:
+                        document.getElementById(
+                            "endDate"
+                        ).value,
+
+                    reason:
+                        document.getElementById(
+                            "reason"
+                        ).value,
+
+                    status:
+                        "Pending"
+                };
+
+
+                // Leave backend ला पाठवतो
+                fetch("/leaves", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            leaveData
+                        )
+
+                })
+
+                .then(response =>
+                    response.json()
+                )
+
+                .then(result => {
+
+                    document.getElementById(
+                        "leaveMessage"
+                    ).innerText =
+                        "Leave applied successfully";
+
+
+                    // Form clear
+                    document.getElementById(
+                        "leaveForm"
+                    ).reset();
+
+
+                    // Leave history refresh
+                    loadEmployeeLeaves();
+
+                })
+
+                .catch(error => {
+
+                    console.error(
+                        "Apply Leave Error:",
+                        error
+                    );
+
+                    document.getElementById(
+                        "leaveMessage"
+                    ).innerText =
+                        "Unable to apply leave";
+
+                });
+
+            }
+        );
+
+
+        // ================= NOTIFICATIONS =================
+
+        function loadNotifications(leaves) {
+
+            const notificationDiv =
+                document.getElementById(
+                    "notifications"
+                );
+
+
+            notificationDiv.innerHTML = "";
+
+
+            if (leaves.length === 0) {
+
+                notificationDiv.innerHTML =
+                    "<p>No notifications</p>";
+
+                return;
+            }
+
+
+            leaves.forEach(leave => {
+
+                const p =
+                    document.createElement("p");
+
+
+                if (leave.status === "Approved") {
+
+                    p.innerText =
+                        "Your " +
+                        leave.leaveType +
+                        " has been approved.";
+
+                }
+
+                else if (leave.status === "Rejected") {
+
+                    p.innerText =
+                        "Your " +
+                        leave.leaveType +
+                        " has been rejected.";
+
+                }
+
+                else {
+
+                    p.innerText =
+                        "Your " +
+                        leave.leaveType +
+                        " request is pending.";
+
+                }
+
+
+                notificationDiv.appendChild(p);
+
+            });
+
+        }
+
+
+        // ================= LOGOUT =================
+
+        function logout() {
+
+            // Login information remove karto
+            localStorage.clear();
+
+            // Login page वर परत जातो
+            window.location.href =
+                "index.html";
+
+        }
+
+
+        // ================= PAGE LOAD =================
+
+        // Employee profile load
+        loadEmployeeProfile();
+
+        // Employee leaves load
+        loadEmployeeLeaves();
+
+    </script>
+
+</body>
+
+</html>
+
